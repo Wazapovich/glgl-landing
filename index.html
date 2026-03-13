@@ -232,9 +232,7 @@
     .btn-secondary:hover { border-color: var(--text-faint); color: var(--text); }
 
     .hero-divider {
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,212,170,0.2), transparent);
+      display: none;
     }
 
     /* --- SECTION LABEL --- */
@@ -842,7 +840,7 @@
 
       // Pulses: bright segments traveling along grid lines
       const pulses = [];
-      const MAX_PULSES = 40;
+      const MAX_PULSES = 3;
 
       function spawnPulse() {
         if (pulses.length >= MAX_PULSES) return;
@@ -999,8 +997,8 @@
 
         // Spawn pulses near cursor
         spawnTimer++;
-        if (mouseIn && spawnTimer % 3 === 0) spawnPulse();
-        else if (!mouseIn && spawnTimer % 12 === 0) spawnPulse();
+        if (mouseIn && spawnTimer % 40 === 0) spawnPulse();
+        else if (!mouseIn && spawnTimer % 120 === 0) spawnPulse();
 
         drawPulses(w, h);
         drawVignette(w, h);
