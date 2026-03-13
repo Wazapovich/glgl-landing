@@ -114,13 +114,13 @@
 
     .hero-glow {
       position: absolute;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 0;
+      left: 0;
       width: 800px;
       height: 800px;
       background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
       pointer-events: none;
+      will-change: transform;
     }
 
     .hero-grid {
@@ -829,6 +829,41 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Interactive glow that follows cursor
+    (() => {
+      const hero = document.querySelector('.hero');
+      const glow = document.querySelector('.hero-glow');
+      let targetX = hero.offsetWidth / 2;
+      let targetY = hero.offsetHeight * 0.2;
+      let currentX = targetX;
+      let currentY = targetY;
+      const ease = 0.08;
+
+      function setGlow(x, y) {
+        glow.style.transform = 'translate(' + (x - 400) + 'px,' + (y - 400) + 'px)';
+      }
+      setGlow(currentX, currentY);
+
+      hero.addEventListener('mousemove', (e) => {
+        const rect = hero.getBoundingClientRect();
+        targetX = e.clientX - rect.left;
+        targetY = e.clientY - rect.top;
+      });
+
+      hero.addEventListener('mouseleave', () => {
+        targetX = hero.offsetWidth / 2;
+        targetY = hero.offsetHeight * 0.2;
+      });
+
+      function animate() {
+        currentX += (targetX - currentX) * ease;
+        currentY += (targetY - currentY) * ease;
+        setGlow(currentX, currentY);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
   </script>
 </body>
 </html>
