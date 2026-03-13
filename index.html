@@ -116,22 +116,17 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(circle, rgba(0,212,170,0.18) 0%, rgba(0,212,170,0.06) 30%, transparent 65%);
       pointer-events: none;
       will-change: transform;
     }
 
-    .hero-grid {
+    .hero-grid-canvas {
       position: absolute;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      pointer-events: none;
     }
 
     .hero-content { position: relative; z-index: 1; }
@@ -644,7 +639,7 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-glow"></div>
-    <div class="hero-grid"></div>
+    <canvas class="hero-grid-canvas"></canvas>
     <div class="hero-content">
       <div class="logo-mark">
         <span class="bracket">[</span>
@@ -830,36 +825,186 @@
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // Interactive glow that follows cursor
+    // Interactive glow + neon grid with data pulses
     (() => {
       const hero = document.querySelector('.hero');
       const glow = document.querySelector('.hero-glow');
+      const canvas = document.querySelector('.hero-grid-canvas');
+      const ctx = canvas.getContext('2d');
+      const GRID = 60;
+      const GLOW_HALF = 450;
+      const ease = 0.07;
+
       let targetX = hero.offsetWidth / 2;
       let targetY = hero.offsetHeight * 0.2;
-      let currentX = targetX;
-      let currentY = targetY;
-      const ease = 0.08;
+      let curX = targetX, curY = targetY;
+      let mouseIn = false;
 
-      function setGlow(x, y) {
-        glow.style.transform = 'translate(' + (x - 400) + 'px,' + (y - 400) + 'px)';
+      // Pulses: bright segments traveling along grid lines
+      const pulses = [];
+      const MAX_PULSES = 40;
+
+      function spawnPulse() {
+        if (pulses.length >= MAX_PULSES) return;
+        // Snap to nearest grid intersection near cursor
+        const gx = Math.round(curX / GRID) * GRID;
+        const gy = Math.round(curY / GRID) * GRID;
+        // Jitter start position slightly
+        const jitterCells = Math.floor(Math.random() * 3) - 1;
+        const horizontal = Math.random() > 0.5;
+        const dir = Math.random() > 0.5 ? 1 : -1;
+        pulses.push({
+          x: horizontal ? gx + jitterCells * GRID : gx,
+          y: horizontal ? gy : gy + jitterCells * GRID,
+          horizontal,
+          dir,
+          speed: 1.5 + Math.random() * 3,
+          length: 30 + Math.random() * 80,
+          life: 1,
+          decay: 0.004 + Math.random() * 0.006
+        });
       }
-      setGlow(currentX, currentY);
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = hero.offsetWidth;
+        const h = hero.offsetHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resize();
+      window.addEventListener('resize', resize);
 
       hero.addEventListener('mousemove', (e) => {
         const rect = hero.getBoundingClientRect();
         targetX = e.clientX - rect.left;
         targetY = e.clientY - rect.top;
+        mouseIn = true;
       });
 
       hero.addEventListener('mouseleave', () => {
         targetX = hero.offsetWidth / 2;
         targetY = hero.offsetHeight * 0.2;
+        mouseIn = false;
       });
 
+      function drawGrid(w, h) {
+        const cx = curX, cy = curY;
+        const radius = 280;
+
+        // Draw vertical lines
+        for (let x = 0; x <= w; x += GRID) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+
+          // Proximity glow
+          const dx = Math.abs(x - cx);
+          if (dx < radius) {
+            const intensity = (1 - dx / radius);
+            ctx.strokeStyle = 'rgba(0,212,170,' + (0.02 + intensity * 0.12) + ')';
+            ctx.lineWidth = 1 + intensity * 0.5;
+          } else {
+            ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+            ctx.lineWidth = 1;
+          }
+          ctx.stroke();
+        }
+
+        // Draw horizontal lines
+        for (let y = 0; y <= h; y += GRID) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+
+          const dy = Math.abs(y - cy);
+          if (dy < radius) {
+            const intensity = (1 - dy / radius);
+            ctx.strokeStyle = 'rgba(0,212,170,' + (0.02 + intensity * 0.12) + ')';
+            ctx.lineWidth = 1 + intensity * 0.5;
+          } else {
+            ctx.strokeStyle = 'rgba(255,255,255,0.015)';
+            ctx.lineWidth = 1;
+          }
+          ctx.stroke();
+        }
+      }
+
+      function drawPulses(w, h) {
+        for (let i = pulses.length - 1; i >= 0; i--) {
+          const p = pulses[i];
+          p.life -= p.decay;
+          if (p.life <= 0) { pulses.splice(i, 1); continue; }
+
+          const move = p.speed * p.dir;
+          if (p.horizontal) p.x += move; else p.y += move;
+
+          // Remove if off screen
+          if (p.x < -100 || p.x > w + 100 || p.y < -100 || p.y > h + 100) {
+            pulses.splice(i, 1); continue;
+          }
+
+          const alpha = p.life * 0.7;
+          const grad = p.horizontal
+            ? ctx.createLinearGradient(p.x - p.length * p.dir, p.y, p.x, p.y)
+            : ctx.createLinearGradient(p.x, p.y - p.length * p.dir, p.x, p.y);
+          grad.addColorStop(0, 'rgba(0,212,170,0)');
+          grad.addColorStop(0.7, 'rgba(0,212,170,' + (alpha * 0.4) + ')');
+          grad.addColorStop(1, 'rgba(0,212,170,' + alpha + ')');
+
+          ctx.beginPath();
+          if (p.horizontal) {
+            ctx.moveTo(p.x - p.length * p.dir, p.y);
+            ctx.lineTo(p.x, p.y);
+          } else {
+            ctx.moveTo(p.x, p.y - p.length * p.dir);
+            ctx.lineTo(p.x, p.y);
+          }
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Bright head dot
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,212,170,' + (alpha * 0.9) + ')';
+          ctx.fill();
+        }
+      }
+
+      function drawVignette(w, h) {
+        const grad = ctx.createRadialGradient(w / 2, h / 2, w * 0.15, w / 2, h / 2, w * 0.55);
+        grad.addColorStop(0, 'rgba(9,9,11,0)');
+        grad.addColorStop(1, 'rgba(9,9,11,1)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      let spawnTimer = 0;
       function animate() {
-        currentX += (targetX - currentX) * ease;
-        currentY += (targetY - currentY) * ease;
-        setGlow(currentX, currentY);
+        curX += (targetX - curX) * ease;
+        curY += (targetY - curY) * ease;
+
+        // Move glow
+        glow.style.transform = 'translate(' + (curX - GLOW_HALF) + 'px,' + (curY - GLOW_HALF) + 'px)';
+
+        const w = hero.offsetWidth;
+        const h = hero.offsetHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        drawGrid(w, h);
+
+        // Spawn pulses near cursor
+        spawnTimer++;
+        if (mouseIn && spawnTimer % 3 === 0) spawnPulse();
+        else if (!mouseIn && spawnTimer % 12 === 0) spawnPulse();
+
+        drawPulses(w, h);
+        drawVignette(w, h);
+
         requestAnimationFrame(animate);
       }
       animate();
