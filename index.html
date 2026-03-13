@@ -109,7 +109,6 @@
       text-align: center;
       padding: 6rem 2rem 4rem;
       position: relative;
-      overflow: hidden;
     }
 
     .hero-glow {
@@ -125,7 +124,10 @@
 
     .hero-grid-canvas {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100% + 200px);
       pointer-events: none;
     }
 
@@ -863,10 +865,11 @@
         });
       }
 
+      const OVERFLOW = 200;
       function resize() {
         const dpr = window.devicePixelRatio || 1;
         const w = hero.offsetWidth;
-        const h = hero.offsetHeight;
+        const h = hero.offsetHeight + OVERFLOW;
         canvas.width = w * dpr;
         canvas.height = h * dpr;
         canvas.style.width = w + 'px';
@@ -974,11 +977,30 @@
       }
 
       function drawVignette(w, h) {
-        const grad = ctx.createRadialGradient(w / 2, h / 2, w * 0.15, w / 2, h / 2, w * 0.55);
-        grad.addColorStop(0, 'rgba(9,9,11,0)');
-        grad.addColorStop(1, 'rgba(9,9,11,1)');
-        ctx.fillStyle = grad;
+        // Side fade (left & right)
+        var lg = ctx.createLinearGradient(0, 0, w, 0);
+        lg.addColorStop(0, 'rgba(9,9,11,1)');
+        lg.addColorStop(0.15, 'rgba(9,9,11,0)');
+        lg.addColorStop(0.85, 'rgba(9,9,11,0)');
+        lg.addColorStop(1, 'rgba(9,9,11,1)');
+        ctx.fillStyle = lg;
         ctx.fillRect(0, 0, w, h);
+
+        // Top fade
+        var tg = ctx.createLinearGradient(0, 0, 0, h * 0.12);
+        tg.addColorStop(0, 'rgba(9,9,11,0.8)');
+        tg.addColorStop(1, 'rgba(9,9,11,0)');
+        ctx.fillStyle = tg;
+        ctx.fillRect(0, 0, w, h * 0.12);
+
+        // Bottom fade — gradual so grid bleeds into next section
+        var heroH = h - OVERFLOW;
+        var bg = ctx.createLinearGradient(0, heroH * 0.55, 0, h);
+        bg.addColorStop(0, 'rgba(9,9,11,0)');
+        bg.addColorStop(0.5, 'rgba(9,9,11,0.6)');
+        bg.addColorStop(1, 'rgba(9,9,11,1)');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, heroH * 0.55, w, h - heroH * 0.55);
       }
 
       let spawnTimer = 0;
@@ -990,7 +1012,7 @@
         glow.style.transform = 'translate(' + (curX - GLOW_HALF) + 'px,' + (curY - GLOW_HALF) + 'px)';
 
         const w = hero.offsetWidth;
-        const h = hero.offsetHeight;
+        const h = hero.offsetHeight + OVERFLOW;
         ctx.clearRect(0, 0, w, h);
 
         drawGrid(w, h);
