@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>GLGL</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#09090b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GLGL">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css?v=67">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body>
+  <!-- In-App Browser Warning -->
+  <div class="inapp-banner" id="inapp-banner" style="display:none">
+    <div class="inapp-banner-card">
+      <h1 class="auth-gate-title">GLGL</h1>
+      <p class="inapp-banner-msg">This browser doesn't support Google Sign-In.<br>Please open in Safari or Chrome.</p>
+      <button class="auth-gate-btn" id="inapp-copy-btn">Copy Link</button>
+      <p class="inapp-banner-hint" id="inapp-hint">Then paste it in Safari or Chrome</p>
+    </div>
+  </div>
+
+  <!-- Auth Gate -->
+  <div class="auth-gate" id="auth-gate">
+    <div class="auth-gate-card">
+      <h1 class="auth-gate-title">GLGL</h1>
+      <p class="auth-gate-subtitle">Track habits. Build momentum.</p>
+      <button class="auth-gate-btn" id="auth-gate-signin">Sign in with Google</button>
+    </div>
+  </div>
+
+  <div class="app" style="display:none">
+    <div class="app-layout">
+
+      <!-- ===== DESKTOP SIDEBAR ===== -->
+      <aside class="side-panel" id="side-panel">
+        <div class="side-panel-logo">GLGL</div>
+        <nav class="side-panel-nav">
+          <button class="side-nav-item active" data-category="habits">
+            <span class="side-nav-icon">&#9632;</span> Habits
+          </button>
+          <button class="side-nav-item" data-category="tasks">
+            <span class="side-nav-icon">&#10003;</span> Tasks
+          </button>
+          <button class="side-nav-item" data-category="challenges">
+            <span class="side-nav-icon">&#9733;</span> Challenges
+          </button>
+        </nav>
+        <div class="side-panel-bottom" id="side-panel-avatar">
+          <div class="side-panel-avatar-img" id="side-panel-avatar-img">?</div>
+          <span class="side-panel-user-name" id="side-panel-user-name"></span>
+        </div>
+      </aside>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <div class="main-content" id="main-content">
+        <header class="header">
+          <div class="header-left">
+            <h1>GLGL</h1>
+          </div>
+          <div class="header-right">
+            <button class="notif-bell-btn" id="notif-bell-btn" title="Notifications">
+              <span class="notif-bell-icon">&#x1f514;</span>
+              <span class="notif-badge" id="notif-badge" style="display:none">0</span>
+            </button>
+            <button class="profile-btn" id="profile-btn" title="Profile">
+              <span class="profile-btn-initial" id="profile-btn-content">?</span>
+            </button>
+            <button class="reset-day-btn" id="reset-day-btn" title="Reset today">&#x21bb;</button>
+            <input type="date" id="week-start">
+          </div>
+        </header>
+
+        <!-- Scope Tabs: Daily | Weekly | Monthly -->
+        <div class="scope-tabs" id="scope-tabs">
+          <button class="scope-tab active" data-scope="daily">Daily</button>
+          <button class="scope-tab" data-scope="weekly">Weekly</button>
+          <button class="scope-tab" data-scope="monthly">Monthly</button>
+        </div>
+
+        <!-- Dynamic view container — rendered by JS -->
+        <div id="view-container"></div>
+
+      </div><!-- /main-content -->
+    </div><!-- /app-layout -->
+
+    <!-- ===== BOTTOM NAV (mobile) ===== -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <button class="bottom-nav-item active" data-category="habits">
+        <span class="bottom-nav-icon">&#9632;</span>
+        <span class="bottom-nav-label">Habits</span>
+      </button>
+      <button class="bottom-nav-item" data-category="tasks">
+        <span class="bottom-nav-icon">&#10003;</span>
+        <span class="bottom-nav-label">Tasks</span>
+      </button>
+      <button class="bottom-nav-item" data-category="challenges">
+        <span class="bottom-nav-icon">&#9733;</span>
+        <span class="bottom-nav-label">Challenges</span>
+      </button>
+      <button class="bottom-nav-item" id="bottom-nav-avatar">
+        <span class="bottom-nav-avatar-img" id="bottom-nav-avatar-img">?</span>
+        <span class="bottom-nav-label">Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Challenge Create Overlay -->
+  <div class="ch-create-overlay" id="ch-create-overlay">
+    <div class="ch-create-panel">
+      <div class="ch-create-header">
+        <button class="user-view-back" id="ch-create-back">&larr;</button>
+        <h2 id="ch-create-title">Create Challenge</h2>
+        <div></div>
+      </div>
+      <div class="ch-create-body" id="ch-create-body"></div>
+    </div>
+  </div>
+
+  <!-- Challenge Detail Overlay (removed — now inline accordion) -->
+
+  <!-- Dashboard Overlay -->
+  <div class="dashboard-overlay" id="dashboard-overlay">
+    <div class="dashboard-panel">
+      <div class="dashboard-header">
+        <button class="dashboard-back" id="dashboard-back">&larr;</button>
+        <h2>Dashboard</h2>
+        <div></div>
+      </div>
+
+      <!-- Profile Card -->
+      <div class="dashboard-profile-card" id="dashboard-profile-card">
+        <div class="dashboard-photo" id="dashboard-photo">
+          <span class="dashboard-photo-initial">?</span>
+        </div>
+        <div class="dashboard-name" id="dashboard-name"></div>
+        <div class="dashboard-nickname" id="dashboard-nickname"></div>
+        <div class="dashboard-meta" id="dashboard-meta"></div>
+        <button class="dashboard-edit-btn" id="dashboard-edit-btn">Edit Profile</button>
+      </div>
+
+      <!-- Profile Edit (hidden by default) -->
+      <div class="dashboard-edit-form" id="dashboard-edit-form" style="display:none"></div>
+
+      <!-- Social Stats -->
+      <div class="dashboard-social-stats" id="dashboard-social-stats">
+        <button class="social-stat-btn" id="dash-followers-btn">
+          <span class="social-stat-count" id="dash-followers-count">0</span>
+          <span class="social-stat-label">Followers</span>
+        </button>
+        <button class="social-stat-btn" id="dash-following-btn">
+          <span class="social-stat-count" id="dash-following-count">0</span>
+          <span class="social-stat-label">Following</span>
+        </button>
+      </div>
+
+      <!-- Social List (followers/following) -->
+      <div class="dashboard-social-list" id="dashboard-social-list" style="display:none">
+        <div class="dashboard-section-title" id="dash-social-list-title">Following</div>
+        <div class="social-list" id="dash-social-list"></div>
+      </div>
+
+      <!-- User Search -->
+      <div class="dashboard-search-wrap">
+        <input type="text" class="social-search-input" id="dash-search" placeholder="Search users..." autocomplete="off">
+        <div class="social-search-results" id="dash-search-results"></div>
+      </div>
+
+      <!-- Active Challenges -->
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Active Challenges</div>
+        <div id="dash-challenges-list"></div>
+      </div>
+
+      <!-- Achievements -->
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Achievements</div>
+        <div class="dashboard-achievements-grid" id="dash-achievements-grid"></div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Recent Activity</div>
+        <div id="dash-feed"></div>
+      </div>
+
+      <!-- Settings -->
+      <div class="dashboard-section">
+        <div class="dashboard-section-title">Settings</div>
+        <div class="reminder-settings" id="reminder-settings">
+          <div class="reminder-row">
+            <div class="reminder-label">
+              <span class="reminder-icon">&#x1f514;</span>
+              <span>Daily Reminder</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="reminder-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="reminder-time-row" id="reminder-time-row" style="display:none">
+            <label class="reminder-time-label">Remind me at</label>
+            <input type="time" id="reminder-time" class="reminder-time-input" value="09:00">
+          </div>
+          <div class="reminder-status" id="reminder-status"></div>
+        </div>
+        <div class="profile-auth" id="profile-auth"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Panel Overlay -->
+  <div class="notif-overlay" id="notif-overlay">
+    <div class="notif-panel">
+      <div class="notif-panel-top">
+        <h2>Notifications</h2>
+        <div class="notif-panel-actions">
+          <button class="notif-mark-all-btn" id="notif-mark-all-btn">Mark all read</button>
+          <button class="notif-close-btn" id="notif-close-btn">&times;</button>
+        </div>
+      </div>
+      <div class="notif-list" id="notif-list">
+        <div class="notif-empty" id="notif-empty">No notifications yet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User View Overlay -->
+  <div class="user-view-overlay" id="user-view-overlay">
+    <div class="user-view-panel">
+      <div class="user-view-header">
+        <button class="user-view-back" id="user-view-back">&larr;</button>
+        <div class="user-view-profile">
+          <div class="user-view-photo" id="user-view-photo"></div>
+          <div class="user-view-info">
+            <div class="user-view-name" id="user-view-name"></div>
+            <div class="user-view-counts" id="user-view-counts"></div>
+          </div>
+        </div>
+        <button class="user-view-follow-btn" id="user-view-follow-btn">Follow</button>
+      </div>
+      <div class="user-view-body" id="user-view-body"></div>
+    </div>
+  </div>
+
+  <!-- Confirm Overlay -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <div class="confirm-icon">&#x21bb;</div>
+      <div class="confirm-title" id="confirm-title">Reset Day?</div>
+      <div class="confirm-msg" id="confirm-msg">This will uncheck all habits and tasks for today.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" id="confirm-cancel">Cancel</button>
+        <button class="confirm-btn reset" id="confirm-ok">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-app browser detection (must run first) -->
+  <script>
+    (function() {
+      var ua = navigator.userAgent || '';
+      var isInApp = /FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|Twitter|MicroMessenger|Snapchat|Pinterest|LinkedInApp/i.test(ua);
+      // Also catch generic in-app WebViews on iOS (not Safari) and Android (not Chrome)
+      if (!isInApp && /iPhone|iPad|iPod/.test(ua) && !/Safari/i.test(ua)) isInApp = true;
+      if (isInApp) {
+        document.getElementById('inapp-banner').style.display = 'flex';
+        document.getElementById('auth-gate').style.display = 'none';
+        var copyBtn = document.getElementById('inapp-copy-btn');
+        copyBtn.addEventListener('click', function() {
+          var url = window.location.href;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function() {
+              document.getElementById('inapp-hint').textContent = 'Link copied! Paste in Safari or Chrome';
+              copyBtn.textContent = 'Copied!';
+              setTimeout(function() { copyBtn.textContent = 'Copy Link'; }, 2000);
+            });
+          } else {
+            // Fallback for older browsers
+            var input = document.createElement('input');
+            input.value = url;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            document.getElementById('inapp-hint').textContent = 'Link copied! Paste in Safari or Chrome';
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function() { copyBtn.textContent = 'Copy Link'; }, 2000);
+          }
+        });
+      }
+    })();
+  </script>
+
+  <!-- Firebase SDK (compat for vanilla JS — no bundler needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <!-- App -->
+  <script src="firebase-config.js?v=67"></script>
+  <script src="app.js?v=67"></script>
+  <script src="firebase-sync.js?v=67"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' });
+    }
+  </script>
+</body>
+</html>
