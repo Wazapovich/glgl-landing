@@ -98,7 +98,7 @@ body {
 }
 .auth-gate-btn {
   display: inline-block;
-  background: linear-gradient(135deg, var(--accent) 0%, #5cb86c 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   color: #0a0b0f;
   font-size: 15px;
   font-weight: 700;
@@ -928,7 +928,7 @@ body {
   text-overflow: ellipsis;
 }
 .social-follow-btn {
-  background: linear-gradient(135deg, var(--accent) 0%, #5cb86c 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   color: #0a0b0f;
   border: none;
   border-radius: 8px;
@@ -1041,7 +1041,7 @@ body {
   color: var(--text-dim);
 }
 .user-view-follow-btn {
-  background: linear-gradient(135deg, var(--accent) 0%, #5cb86c 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   color: #0a0b0f;
   border: none;
   border-radius: 8px;
@@ -1461,7 +1461,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .hero-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent) 0%, #4ade80 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, #34ebc6 100%);
   border-radius: 3px;
   transition: width 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
   width: 0%;
@@ -1703,7 +1703,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .daily-list-check.checked {
-  background: linear-gradient(135deg, var(--accent) 0%, #4ade80 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   border-color: transparent;
   box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
 }
@@ -2031,7 +2031,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .weekly-habit-cell.checked .cell-box {
-  background: linear-gradient(135deg, var(--accent) 0%, #4ade80 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   border-color: transparent;
   box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
 }
@@ -2158,7 +2158,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .weekly-task-check.checked {
-  background: linear-gradient(135deg, var(--accent) 0%, #4ade80 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   border-color: transparent;
   box-shadow: 0 1px 4px rgba(0, 212, 170, 0.3);
 }
@@ -2490,8 +2490,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .ch-card.expanded .ch-card-detail {
   max-height: 2000px;
+  overflow-y: auto;
   opacity: 1;
   border-top: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
 }
 .ch-card-detail:empty {
   border-top: none !important;
@@ -2814,7 +2816,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .ch-submit-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--accent) 0%, #5cb86c 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   color: #0a0b0f;
   border: none;
   border-radius: 12px;
@@ -2865,7 +2867,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .ch-join-btn {
   flex: 1;
   padding: 12px;
-  background: linear-gradient(135deg, var(--accent) 0%, #5cb86c 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   color: #0a0b0f;
   border: none;
   border-radius: 10px;
@@ -3022,7 +3024,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: var(--text-dim);
 }
 .ch-week-cell.checked .cell-box {
-  background: linear-gradient(135deg, var(--accent) 0%, #4ade80 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #34ebc6 100%);
   border-color: transparent;
   color: #0a0b0f;
   box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
@@ -3273,9 +3275,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   100% { transform: scale(1); }
 }
 @keyframes checkGlow {
-  0%   { box-shadow: 0 0 0 0 rgba(147, 196, 125, 0.5); }
-  70%  { box-shadow: 0 0 0 10px rgba(147, 196, 125, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(147, 196, 125, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(0, 212, 170, 0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(0, 212, 170, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 212, 170, 0); }
 }
 .daily-list-check.animate-check {
   animation: checkPop 0.35s cubic-bezier(0.36, 1.6, 0.4, 1), checkGlow 0.5s ease-out;
@@ -3466,7 +3468,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 @keyframes completionFlash {
   0% { background: var(--surface); }
-  30% { background: rgba(147, 196, 125, 0.15); }
+  30% { background: rgba(0, 212, 170, 0.15); }
   100% { background: var(--surface); }
 }
 
@@ -3509,7 +3511,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* Subtle gradient accent on leaderboard progress bars */
 .ch-lb-bar .hero-bar-fill {
-  background: linear-gradient(90deg, var(--accent) 0%, #4ade80 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, #34ebc6 100%);
   box-shadow: 0 0 8px rgba(0, 212, 170, 0.3);
 }
 

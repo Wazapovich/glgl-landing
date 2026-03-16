@@ -799,10 +799,17 @@
 
   async function sendWelcomeNotification() {
     if (!currentUser) return;
+    // Check if welcome was already sent (prevents duplicate on new device/domain)
+    const existing = await db.collection('users').doc(currentUser.uid)
+      .collection('notifications')
+      .where('type', '==', 'welcome')
+      .limit(1)
+      .get();
+    if (!existing.empty) return;
     await createNotification(
       currentUser.uid,
       'welcome',
-      'Welcome to Mindset Stack!',
+      'Welcome to GLGL!',
       'Congratulations on joining! Start tracking your habits and build momentum.',
       {}
     );
