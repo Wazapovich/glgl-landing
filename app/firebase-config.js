@@ -39,7 +39,7 @@
 
 const firebaseConfig = {
   apiKey:            "AIzaSyB2AWqOIc2H8HpbJzQHXvomE1rmPEnEHUg",
-  authDomain:        "glgl.app",
+  authDomain:        "mindstack-c5a42.firebaseapp.com",
   projectId:         "mindstack-c5a42",
   storageBucket:     "mindstack-c5a42.firebasestorage.app",
   messagingSenderId: "620679823732",
