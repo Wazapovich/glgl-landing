@@ -2615,6 +2615,27 @@ async function renderMyChallenges() {
       return;
     }
     list.forEach(ch => container.appendChild(createChallengeCard(ch)));
+
+    // Asynchronously load progress for each challenge
+    const uid = window.firebaseUser ? window.firebaseUser.uid : null;
+    if (uid) {
+      list.forEach(async (ch) => {
+        try {
+          const challengeId = ch.challengeId || ch.id;
+          const data = await window.challengeSync.loadChallengeDetail(challengeId);
+          if (!data) return;
+          const myData = data.participants.find(p => p.uid === uid) || { weeks: {} };
+          const progress = calculateChallengeProgress(data, myData);
+          const fill = container.querySelector(`[data-progress-for="${challengeId}"]`);
+          if (fill) {
+            fill.style.width = progress + '%';
+            fill.style.transition = 'width 0.6s ease';
+          }
+        } catch (e) {
+          console.error('[challenges] progress calc failed:', e);
+        }
+      });
+    }
   } catch (e) {
     console.error('[challenges] load failed:', e);
     container.innerHTML = '<div class="ch-empty">Failed to load challenges</div>';
@@ -2669,7 +2690,7 @@ function createChallengeCard(ch) {
           <span>${ch.mode === 'group' ? pCount + ' participant' + (pCount !== 1 ? 's' : '') : 'Solo'}</span>
           <span>${itemCount} item${itemCount !== 1 ? 's' : ''} · ${formatShortDate(ch.startDate)} – ${formatShortDate(ch.endDate)}</span>
         </div>
-        <div class="ch-card-progress"><div class="hero-bar"><div class="hero-bar-fill" style="width:0%"></div></div></div>
+        <div class="ch-card-progress"><div class="hero-bar"><div class="hero-bar-fill" data-progress-for="${challengeId}" style="width:0%"></div></div></div>
       </div>
       <div class="ch-card-chevron">›</div>
     </div>
@@ -2892,6 +2913,15 @@ function renderChallengeDetailInline(card, data) {
         myData.weeks[weekStart].checks[itemId] = arr;
 
         renderChallengeDetailInline(card, data);
+
+        // Update progress bar in card summary
+        const progress = calculateChallengeProgress(data, myData);
+        const challengeId = data.id || data.challengeId;
+        const fill = card.querySelector(`[data-progress-for="${challengeId}"]`);
+        if (fill) {
+          fill.style.width = progress + '%';
+          fill.style.transition = 'width 0.3s ease';
+        }
 
         // Persist
         try {
