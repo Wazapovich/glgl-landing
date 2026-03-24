@@ -2697,21 +2697,7 @@ function createChallengeCard(ch) {
     <div class="ch-card-detail"></div>
   `;
 
-  // Use touch tracking to prevent scroll gestures from triggering toggle
-  let touchStartY = null;
-  const summary = card.querySelector('.ch-card-summary');
-  summary.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
-  summary.addEventListener('touchend', (e) => {
-    if (touchStartY !== null && Math.abs(e.changedTouches[0].clientY - touchStartY) > 10) {
-      touchStartY = null;
-      return; // was a scroll, not a tap
-    }
-    touchStartY = null;
-    toggleChallengeCard(card, challengeId);
-  });
-  summary.addEventListener('click', (e) => {
-    // Only handle on non-touch devices
-    if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
+  card.querySelector('.ch-card-summary').addEventListener('click', () => {
     toggleChallengeCard(card, challengeId);
   });
   return card;

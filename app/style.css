@@ -29,8 +29,9 @@
   --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.06);
 }
 
-html, body {
-  overscroll-behavior: none;
+html {
+  overflow: hidden;
+  height: 100%;
 }
 
 body {
@@ -39,7 +40,8 @@ body {
   background-image: var(--bg-gradient);
   color: var(--text);
   line-height: 1.5;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -126,12 +128,15 @@ body {
 
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 .main-content {
   flex: 1;
   min-width: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 24px;
   padding-top: calc(24px + env(safe-area-inset-top));
   padding-bottom: calc(80px + env(safe-area-inset-bottom));
